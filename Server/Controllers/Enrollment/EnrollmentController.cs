@@ -16,42 +16,42 @@ using System.Threading.Tasks;
 using Telerik.DataSource;
 using Telerik.DataSource.Extensions;
 
-namespace SWARM.Server.Controllers.Crse
+namespace SWARM.Server.Controllers.Enrollmentz
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CourseController : Controller
+    public class EnrollmentController : Controller
     {
         protected readonly SWARMOracleContext _context;
         protected readonly IHttpContextAccessor _httpContextAccessor;
 
-        public CourseController(SWARMOracleContext context, IHttpContextAccessor httpContextAccessor)
+        public EnrollmentController(SWARMOracleContext context, IHttpContextAccessor httpContextAccessor)
         {
             this._context = context;
             this._httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
-        [Route("GetCourse")]
+        [Route("GetEnrollment")]
         public async Task<IActionResult> Get()
         {
-            List<Course> itmCourse = await _context.Courses.ToListAsync();
-            return Ok(itmCourse);
+            List<Enrollment> itmEnrollment = await _context.Enrollments.ToListAsync();
+            return Ok(itmEnrollment);
         }
 
         [HttpGet]
-        [Route("GetCourse/{pCourseNo}")]
-        public async Task<IActionResult> Get(int pCourseNo)
+        [Route("GetEnrollment/{pSectionId, pStudentId}")]
+        public async Task<IActionResult> Get(int pSectionId, int pStudentId)
         {
-            Course itmCourse = await _context.Courses.Where(x => x.CourseNo == pCourseNo).FirstOrDefaultAsync();
-            return Ok(itmCourse);
+            Enrollment itmEnrollment = await _context.Enrollments.Where(x => x.StudentId == pStudentId).Where(x => x.SectionId == pSectionId).FirstOrDefaultAsync();
+            return Ok(itmEnrollment);
         }
 
 
 
         [HttpDelete]
-        [Route("Delete/{pCourseNo}")]
-        public async Task<IActionResult> Delete(int pCourseNo)
+        [Route("Delete/{pSectionId, pStudentId}")]
+        public async Task<IActionResult> Delete(int pSectionId, int pStudentId)
         {
 
             //get every enrollment with it, delete those
@@ -66,26 +66,26 @@ namespace SWARM.Server.Controllers.Crse
                 _context.Enrollments.Remove(enr);
             }*/
 
-            Course itmCourse = await _context.Courses.Where(x => x.CourseNo == pCourseNo).FirstOrDefaultAsync();
-            _context.Remove(itmCourse);
+            Enrollment itmEnrollment = await _context.Enrollments.Where(x => x.StudentId == pStudentId).Where(x => x.SectionId == pSectionId).FirstOrDefaultAsync();
+            _context.Remove(itmEnrollment);
             await _context.SaveChangesAsync();
             return Ok();
         }
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody] CourseDTO _Course)
+        public async Task<IActionResult> Put([FromBody] EnrollmentDTO _Enrollment)
         {
             bool bExist = false;
             var trans = _context.Database.BeginTransaction();
             try
             {
-                var _Crse = await _context.Courses.Where(x => x.CourseNo == _Course.CourseNo).FirstOrDefaultAsync();
+                var _Enrmt = await _context.Courses.Where(x => x.CourseNo == _Enrollment.CourseNo).FirstOrDefaultAsync();
 
                 //bExist = (existCourse == null) ? false : true;
 
-                if (_Crse == null) { 
+                if (_Enrmt == null) { 
                     bExist = false;
-                _Crse = new Course();
+                _Enrmt = new Enrollment();
                     }
                 else
                     bExist = true;
